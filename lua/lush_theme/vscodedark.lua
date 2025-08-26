@@ -1,850 +1,598 @@
 -- Template: https://github.com/rktjmp/lush-template/blob/main/lua/lush_theme/lush_template.lua
 -- VSCode Theme Color Reference: https://code.visualstudio.com/api/references/theme-color#command-center-colors
 
-local lush = require('lush')
+local lush = require("lush")
 
-local norm_fg = '#cccccc'
-local norm_bg = '#1f1f1f'
+local colors = require("vscodedark.colors")
+local opts = require("vscodedark.config").extend({})
 
-local dark_red = '#D16969'
-local orange = '#f9ae28'
-local brown = '#CE9178'
-local yellow = '#DCDCAA'
-local yellow_orange = '#D7BA7D'
-local green = '#6A9955'
-local blue_green = '#4EC9B0'
-local light_green = '#B5CEA8'
-local blue = '#4fc1ff'
-local light_blue = '#9CDCFE'
-local dark_blue = '#569CD6'
-local cornflower_blue = '#6796E6'
-local dark_pink = '#C586C0'
-local bright_pink = '#f92672'
-local purple = '#ae81ff'
-
-local white = '#ffffff'
-local gray = '#51504f' -- StatuslineNC's fg
-local gray2 = '#6e7681' -- LineNr (editorLineNumber.foreground)
-local gray3 = '#808080'
-local gray4 = '#9d9d9d'
-local black = '#2d2d2d' -- TabLine
-local black2 = '#252526'
-local black3 = '#282828' -- CursorLine (editor.lineHighlightBorder). Or use #2a2d2e (list.hoverBackground) for a brighter color
-local black4 = '#181818' -- Statusline
-
-local error_red = '#F14C4C'
-local warn_yellow = '#CCA700'
-local info_blue = '#3794ff'
-local hint_gray = '#B0B0B0'
-local ok_green = '#89d185' -- color for success, so I use notebookStatusSuccessIcon.foreground
-
-local selected_item_bg = '#04395e'
-local matched_chars = '#2aaaff'
-local folded_blue = '#212d3a' -- editor.foldBackground
-local float_border_fg = '#454545'
-local indent_guide_fg = '#404040'
-local indent_guide_scope_fg = '#707070'
-local label_fg = '#c8c8c8'
-local tab_border_fg = '#2b2b2b'
-
----@diagnostic disable
+---@diagnostic disable: undefined-global
 local theme = lush(function(injected_functions)
   local sym = injected_functions.sym
+
   return {
+    -- UI: Cursor & Editor Columns
+    ColorColumn { bg = colors.indent_guide },  -- Columns set with 'colorcolumn'
+    Cursor { fg = colors.bg, bg = colors.fg }, -- Character under the cursor
+    lCursor { Cursor },                        -- Character under the cursor when |language-mapping| is used (see 'guicursor')
+    CursorIM { Cursor },                       -- Like Cursor, but used when in IME mode |CursorIM|
+    CursorLine { bg = colors.black2 },         -- Screen-line at the cursor, when 'cursorline' is set. Low-priority if foreground (ctermfg OR guifg) is not set.
+    CursorColumn { CursorLine },               -- Screen-column at the cursor, when 'cursorcolumn' is set.
+    Conceal { fg = colors.gray2 },             -- Placeholder characters substituted for concealed text (see 'conceallevel')
 
-    --
-    -- Preset
-    --
-    TabBorder { fg = tab_border_fg }, -- tab.border
-    FloatBorder { fg = float_border_fg },
-    SelectionHighlightBackground { bg = '#343a41' }, -- editor.selectionHighlightBackground
-    LightBulb { fg = '#ffcc00' }, -- editorLightBulb.foreground
-    CodeLens { fg = '#999999' }, -- editorCodeLens.foreground
-    GutterGitAdded { fg = '#2ea043' }, -- editorGutter.addedBackground
-    GutterGitDeleted { fg = '#f85149' }, -- editorGutter.deletedBackground
-    GutterGitModified { fg = '#0078d4' }, -- editorGutter.modifiedBackground
-    Breadcrumb { fg = '#a9a9a9', bg = Normal.bg }, -- breadcrumb.foreground/background
-    ScrollbarGutter { bg = Normal.bg },
-    ScrollbarSlider { bg = '#434343' }, -- the slider on the scrollbar (scrollbarSlider.activeBackground)
-    ScrollbarSliderHover { bg = '#4f4f4f' }, -- scrollbarSlider.hoverBackground
-    PeekViewBorder { fg = '#3794ff' },
-    PeekViewNormal { bg = Normal.bg }, -- peekViewEditor.background
-    PeekViewTitle { fg = white }, -- peekViewTitleLabel.foreground
-    PeekViewCursorLine { bg = black3 },
-    PeekViewMatchHighlight { bg ='#5d4616' }, -- peekViewEditor.matchHighlightBackground
-    GhostText { fg = '#6b6b6b' }, -- editorGhostText.foreground
-    Icon { fg = '#cccccc' }, -- icon.foreground
-    Description { fg = gray4 }, -- descriptionForeground
-    ProgressBar { fg = '#0078d4' }, -- progressBar.background
-    MatchedCharacters { fg = matched_chars }, -- editorSuggestWidget.highlightForeground
-    Hint { MatchedCharacters }, -- for the hint letter in options, e.g., the q in [q]uickfix
-    -- For the unused code, use Identifier's fg (9cdcfe) as the base color,
-    -- editorUnnecessaryCode.opacity is 000000aa (the alpha value is aa),
-    -- so the color will be 9cdcfeaa. Converting hexa to hex gets 729db4.
-    UnnecessaryCode { fg = '#729db4' },
-    -- Git diff
-    DiffTextAdded { bg = '#214d29' }, -- diffEditor.insertedTextBackground (DiffLineAdded as its background)
-    DiffTextDeleted { bg = '#712928' }, -- diffEditor.removedTextBackground (DiffLineDeleted as its background)
-    DiffTextChanged { bg = '#0E2FDC' },
-    DiffLineAdded { bg = '#203424' }, -- diffEditor.insertedLineBackground
-    DiffLineDeleted { bg = '#442423' }, -- diffEditor.removedLineBackground
-    DiffLineChanged { bg = '#0e2f44' },
-    -- Quickfix list (can be used to define qf syntax, e.g.,
-    -- ~/.config/nvim/syntax/qf.vim)
-    QfFileName { fg = white },
-    QfSelection { bg = '#3a3d41' }, -- terminal.inactiveSelectionBackground
-    QfText { fg = '#bbbbbb' }, -- normal text in quickfix list (peekViewResult.lineForeground)
-    -- Inline hints
-    InlayHint { fg = '#969696', bg = '#242424' }, -- editorInlayHint.foreground/background
-    InlayHintType { InlayHint }, -- editorInlayHint.typeBackground/typeForeground
+    -- UI: Window Elements
+    Directory { fg = colors.dark_blue }, -- Directory na:mes (and other special names in listings)
+    EndOfBuffer { fg = Normal.bg },      -- Filler lines (~) after the end of the buffer. By default, this is highlighted like |hl-NonText|.
+    NonText { fg = "#515861" },          -- '@' at the end of the window... See also |hl-EndOfBuffer|.
+    Normal {
+      fg = colors.fg,
+      bg = opts.transparent and colors.none or colors.bg,
+    }, -- Normal text
+    NormalNC {
+      fg = colors.fg,
+      bg = opts.transparent and colors.none or colors.bg,
+    },                                           -- normal text in non-current windows
+    WinBar { fg = "#a8a8a8", bg = Normal.bg },   -- Window bar of current window
+    WinBarNC { fg = "#a8a8a8", bg = Normal.bg }, -- Window bar of not-current windows
+    WinSeparator { fg = "#2d2d2d" },             -- Separator between window splits
+    VertSplit { WinSeparator },                  -- Column separating vertically split windows
+    Whitespace { fg = colors.whitespace },       -- "nbsp", "space", "tab" and "trail" in 'listchars'
 
-    --
-    -- Editor
-    --
-    CursorLine { bg = black3 },
-    CursorColumn { bg = black3 },
-    ColorColumn { bg = black2 }, -- #5a5a5a in VSCode (editorRuler.foreground) it's too bright
-    Conceal { fg = gray2 },
-    Cursor { fg = norm_bg, bg = norm_fg },
-    -- lCursor { },
-    -- CursorIM { },
-    Directory { fg = dark_blue },
-    DiffAdd { DiffLineAdded },
-    DiffDelete { DiffLineDeleted },
-    DiffChange { DiffLineChanged },
-    DiffText { DiffTextChanged },
-    EndOfBuffer { fg = Normal.bg },
-    -- TermCursor { },
-    -- TermCursorNC { },
-    ErrorMsg { fg = error_red },
-    WinSeparator { fg = '#333333' }, -- editorGroup.border
-    VirtSplit { WinSeparator }, -- deprecated and use WinSeparator instead
-    LineNr { fg = gray2 }, -- editorLineNumber.foreground
-    CursorLineNr { fg = '#cccccc' }, -- editorLineNumber.activeForeground
-    Folded { bg = folded_blue },
-    CursorLineFold { CursorLineNr },
-    FoldColumn { LineNr }, -- #c5c5c5 in VSCode (editorGutter.foldingControlForeground) and it's too bright
-    SignColumn { bg = Normal.bg },
-    IncSearch { bg = '#9e6a03' }, -- editor.findMatchBackground
-    -- Substitute { },
-    MatchParen { bg = gray, gui = 'bold, underline' },
-    ModeMsg { fg = norm_fg },
-    MsgArea { fg = norm_fg },
-    -- MsgSeparator { },
-    MoreMsg { fg = norm_fg },
-    NonText { fg = gray2 },
-    Normal { fg = norm_fg, bg = norm_bg },
-    -- NormalNC { },
-    Pmenu { fg = norm_fg, bg = Normal.bg }, -- editorSuggestWidget.background/foreground
-    PmenuSel { fg = white, bg = selected_item_bg },
-    -- PmenuKind = {},
-    -- PmenuKindSel = {},
-    -- PmenuExtra = {},
-    -- PmenuExtraSel = {},
-    PmenuSbar { ScrollbarGutter },
-    PmenuThumb { ScrollbarSlider },
-    PmenuMatch = { fg = matched_chars, bg = norm_bg },
-    PmenuMatchSel = { fg = matched_chars, bg = selected_item_bg, bold = true },
-    NormalFloat { Pmenu },
-    Question { fg = dark_blue },
-    QuickFixLine { QfSelection },
-    Search { bg = '#623315' }, -- editor.findMatchHighlightBackground
-    SpecialKey { NonText },
-    SpellBad { gui = 'undercurl', sp = error_red },
-    SpellCap { gui = 'undercurl', sp = warn_yellow},
-    SpellLocal { gui = 'undercurl', sp = info_blue },
-    SpellRare  { gui = 'undercurl', sp = info_blue  },
-    StatusLine { bg = black4 },
-    StatusLineNC { fg = gray, bg = black4 },
-    TabLine { fg = gray4, bg = black4, gui = 'underline', sp = tab_border_fg }, -- tab.inactiveBackground, tab.inactiveForeground
-    TabLineFill { fg = 'NONE', bg = black4, gui = 'underline', sp = tab_border_fg }, -- editorGroupHeader.tabsBackground
-    TabLineSel { fg = white, bg = Normal.bg, gui = 'bold, underline', sp = tab_border_fg  }, -- tab.activeBackground, tab.activeForeground
-    Title { fg = dark_blue, gui = 'bold' },
-    Visual { bg = '#264F78' }, -- editor.selectionBackground
-    -- VisualNOS { },
-    WarningMsg { fg = warn_yellow },
-    Whitespace { fg = '#3e3e3d' },
-    WildMenu { PmenuSel },
-    Winbar { Breadcrumb },
-    WinbarNC { Breadcrumb },
+    -- UI: Editor Gutter (line numbers, folds, signs)
+    LineNr { fg = "#515861", bg = colors.none },       -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+    LineNrAbove { LineNr },                            -- Line number for when the 'relativenumber' option is set, above the cursor line
+    LineNrBelow { LineNr },                            -- Line number for when the 'relativenumber' option is set, below the cursor line
+    CursorLineNr { fg = "#dfdfdf", bg = colors.none }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
+    SignColumn { bg = Normal.bg },                     -- Column where |signs| are displayed
+    Folded { bg = colors.bg_folded },                  -- Line used for closed folds
+    FoldColumn { SignColumn },                         -- 'foldcolumn'
+    CursorLineFold { CursorLineNr },                   -- Like FoldColumn when 'cursorline' is set for the cursor line
+    CursorLineSign { SignColumn },                     -- Like SignColumn when 'cursorline' is set for the cursor line
 
-    --
-    -- Syntax
-    --
-    Comment { fg = green, gui = 'italic' },
+    -- Diff Mode
+    DiffTextAdded { bg = "#214d29" },   -- Added text within changed lines
+    DiffTextDeleted { bg = "#712928" }, -- Deleted text within changed lines
+    DiffTextChanged { bg = "#283871" }, -- Changed text within changed lines
 
-    Constant { fg = dark_blue },
-    String { fg = brown },
-    Character { Constant },
-    Number { fg = light_green },
-    Boolean { Constant },
-    Float { Number },
+    DiffLineAdded { bg = "#203424" },   -- Entire added lines
+    DiffLineDeleted { bg = "#442423" }, -- Entire deleted lines
+    DiffLineChanged { bg = "#0e2f44" }, -- Entire changed lines
 
-    Identifier { fg = light_blue },
-    Function { fg = yellow },
+    DiffAdd { DiffLineAdded },          -- Diff mode: Added line |diff.txt|
+    DiffChange { DiffLineChanged },     -- Diff mode: Changed line |diff.txt|
+    DiffDelete { DiffLineDeleted },     -- Diff mode: Deleted line |diff.txt|
+    DiffText { DiffTextChanged },       -- Diff mode: Changed text within a changed line |diff.txt|
 
-    Statement { fg = dark_pink },
-    Conditional { Statement },
-    Repeat { Statement },
-    Label { Statement },
-    Operator { fg = norm_fg },
-    Keyword { fg = dark_blue },
-    Exception { Statement },
+    -- Terminal UI
+    TermCursor { Cursor }, -- Cursor in a focused terminal
 
-    PreProc { fg = dark_pink },
-    Include { PreProc },
-    Define { PreProc },
-    Macro { PreProc },
-    PreCondit { PreProc },
+    -- Search & Matching
+    Search { bg = "#462819" },                                    -- Last search pattern highlighting (see 'hlsearch')
+    CurSearch { bg = "#5e3019" },                                 -- Highlighting a search pattern under the cursor (see 'hlsearch')
+    IncSearch { CurSearch },                                      -- 'incsearch' highlighting
+    Substitute { Search },                                        -- |:substitute| replacement text highlighting
+    MatchParen { bg = "#3e3d3d", bold = true, underline = true }, -- Character under the cursor or just before it, if it is a paired bracket
 
-    Type { fg = dark_blue },
-    StorageClass { Type },
-    Structure { Type },
-    Typedef { Type },
+    -- Messages & Prompts
+    ErrorMsg { fg = colors.error },      -- Error messages on the command line
+    WarningMsg { fg = colors.warn },     -- Warning messages
+    MoreMsg { fg = colors.fg },          -- |more-prompt|
+    ModeMsg { fg = colors.fg },          -- 'showmode' message (e.g., "-- INSERT -- ")
+    MsgArea { fg = colors.fg },          -- Area for messages and cmdline
+    MsgSeparator { bg = colors.black4 }, -- Separator for scrolled messages
+    Question { fg = colors.dark_blue },  -- |hit-enter| prompt and yes/no questions
 
-    Special { fg = yellow_orange },
-    SpecialChar { Special },
-    Tag { Special },
-    Delimiter { Special },
-    SpecialComment { Special },
-    Debug { Special },
+    -- Scrollbar
+    Scrollbar { bg = Normal.bg },      -- Scrollbar background
+    ScrollbarThumb { bg = "#5b5b5b" }, -- Scrollbar Thumb
 
-    Underlined { gui = "underline" },
-    -- Ignore { },
-    Error { fg = error_red },
-    Todo { fg = norm_bg, bg = yellow_orange, gui = 'bold' },
+    -- Popup Menu
+    Pmenu { fg = colors.fg, bg = Normal.bg },                             -- Popup menu: Normal item.
+    PmenuSel { fg = colors.white, bg = colors.bg_selected, bold = true }, -- Popup menu: Selected item.
+    PmenuKind { Pmenu },                                                  -- Popup menu: Normal item "kind"
+    PmenuKindSel { PmenuSel },                                            -- Popup menu: Selected item "kind"
+    PmenuExtra { Pmenu },                                                 -- Popup menu: Normal item "extra text"
+    PmenuExtraSel { PmenuSel },                                           -- Popup menu: Selected item "extra text"
+    PmenuSbar { Scrollbar },                                              -- Popup menu: Scrollbar.
+    PmenuThumb { ScrollbarThumb },                                        -- Popup menu: Thumb of the scrollbar.
 
-    --
-    -- diff
-    --
-    -- VSCode doesn't have foreground for git added/removed/changed, so here I
-    -- use the corresponding colors for gutter instead.
-    diffAdded { GutterGitAdded },
-    diffRemoved { GutterGitDeleted },
-    diffChanged { GutterGitModified },
+    -- Quickfix, Wildmenu, Tabline, Statusline
+    QuickFixLine { bg = "#3a3d41" },                         -- Current |quickfix| item
+    WildMenu { PmenuSel },                                   -- Current match in 'wildmenu' completion
+    TabLine { fg = colors.gray4, bg = colors.bg_dark },      -- Tab pages line, not active tab page label
+    TabLineFill { fg = colors.none, bg = colors.bg_dark },   -- Tab pages line, where there are no labels
+    TabLineSel { fg = colors.white, bg = Normal.bg },        -- Tab pages line, active tab page label
+    StatusLine { bg = colors.bg_dark },                      -- Status line of current window
+    StatusLineNC { fg = colors.gray1, bg = colors.bg_dark }, -- Status lines of not-current windows. Note: If this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
 
-    --
-    -- LSP
-    --
-    LspReferenceText { SelectionHighlightBackground },
-    LspReferenceRead { SelectionHighlightBackground },
-    LspReferenceWrite { SelectionHighlightBackground },
-    LspCodeLens { CodeLens },
-    -- LspCodeLensSeparator { }, -- Used to color the separator between two or more code lens.
-    LspSignatureActiveParameter { MatchedCharacters },
-    LspInlayHint { InlayHint },
+    -- Visual Modes
+    Visual { bg = colors.selection }, -- Visual mode selection
+    VisualNOS { Visual },             -- Visual mode selection when vim is "Not Owning the Selection".
 
-    --
-    -- Diagnostics
-    --
-    DiagnosticError { fg = error_red },
-    DiagnosticWarn { fg = warn_yellow },
-    DiagnosticInfo { fg = info_blue },
-    DiagnosticHint { fg = hint_gray },
-    DiagnosticOk { fg = ok_green },
-    DiagnosticVirtualTextError { DiagnosticError, bg = '#332323' },
-    DiagnosticVirtualTextWarn { DiagnosticWarn, bg = '#2f2c1b' },
-    DiagnosticVirtualTextInfo { DiagnosticInfo, bg = '#212a35' },
-    DiagnosticVirtualTextHint { DiagnosticHint, bg = black },
-    DiagnosticVirtualTextOk { DiagnosticOk, bg = '#233323' },
-    DiagnosticUnderlineError { gui = 'undercurl', sp = error_red },
-    DiagnosticUnderlineWarn { gui = 'undercurl', sp = warn_yellow },
-    DiagnosticUnderlineInfo { gui = 'undercurl', sp = info_blue },
-    DiagnosticUnderlineHint { gui = 'undercurl', sp = hint_gray },
-    DiagnosticUnderlineOk { gui = 'undercurl', sp = ok_green },
-    DiagnosticFloatingError { DiagnosticError },
-    DiagnosticFloatingWarn { DiagnosticWarn },
-    DiagnosticFloatingInfo { DiagnosticInfo },
-    DiagnosticFloatingHint { DiagnosticHint },
-    DiagnosticFloatingOk { DiagnosticOk },
-    DiagnosticSignError { DiagnosticError },
-    DiagnosticSignWarn { DiagnosticWarn },
-    DiagnosticSignInfo { DiagnosticInfo },
-    DiagnosticSignHint { DiagnosticHint },
-    DiagnosticSignOk { DiagnosticOk },
-    DiagnosticUnnecessary { UnnecessaryCode, gui = 'undercurl' },
-    DiagnosticDeprecated { fg = gray3, gui = 'strikethrough' },
+    -- Titles & Links
+    Title { fg = colors.dark_blue, bold = true }, -- Titles for output from ":set all", ":autocmd" etc.
+    Underlined { underline = true },              -- Text that stands out, HTML links
 
-    --
-    -- Symbol kinds
-    --
-    SymbolKindText { fg = '#cccccc', bg = 'NONE' },
-    SymbolKindMethod { fg = '#b180d7', bg = 'NONE' },
-    SymbolKindFunction { SymbolKindMethod },
-    SymbolKindConstructor { SymbolKindMethod },
-    SymbolKindField { fg = '#75beff', bg = 'NONE' },
-    SymbolKindVariable { SymbolKindField },
-    SymbolKindClass { fg = '#ee9d28', bg = 'NONE' },
-    SymbolKindInterface { SymbolKindField },
-    SymbolKindModule { SymbolKindText },
-    SymbolKindProperty { SymbolKindText },
-    SymbolKindUnit { SymbolKindText },
-    SymbolKindValue { SymbolKindText },
-    SymbolKindEnum { SymbolKindClass },
-    SymbolKindKeyword { SymbolKindText },
-    SymbolKindSnippet { SymbolKindText },
-    SymbolKindColor { SymbolKindText },
-    SymbolKindFile { SymbolKindText },
-    SymbolKindReference { SymbolKindText },
-    SymbolKindFolder { SymbolKindText },
-    SymbolKindEnumMember { SymbolKindField },
-    SymbolKindConstant { SymbolKindText },
-    SymbolKindStruct { SymbolKindText },
-    SymbolKindEvent { SymbolKindClass },
-    SymbolKindOperator { SymbolKindText },
-    SymbolKindTypeParameter { SymbolKindText },
-    -- Other kinds from VSCode's symbolIcon.*
-    SymbolKindArray { SymbolKindText },
-    SymbolKindBoolean { SymbolKindText },
-    SymbolKindKey { SymbolKindText },
-    SymbolKindNamespace { SymbolKindText },
-    SymbolKindString { SymbolKindText },
-    SymbolKindNull { SymbolKindText },
-    SymbolKindNumber { SymbolKindText },
-    SymbolKindObject { SymbolKindText },
-    SymbolKindPackage { SymbolKindText },
+    -- Floating Windows
+    NormalFloat { Pmenu },                    -- Normal text in floating windows.
+    FloatBorder { fg = colors.float_border }, -- Border of floating windows.
+    FloatTitle { Title },                     -- Title of floating windows.
 
-    -- Treesitter
-    --
-    -- Use the capture names directly as the highlight groups.
-    -- To find all the capture names, see https://github.com/nvim-treesitter/nvim-treesitter/blob/master/CONTRIBUTING.md#highlights)
+    -- Spellchecking
+    SpellBad { sp = colors.error, undercurl = true },  -- Word that is not recognized by the spellchecker
+    SpellCap { sp = colors.warn, undercurl = true },   -- Word that should start with a capital
+    SpellLocal { sp = colors.info, undercurl = true }, -- Word used in another region
+    SpellRare { sp = colors.info, undercurl = true },  -- Rarely used word
 
-    -- Identifiers
-    sym("@variable") { fg = light_blue }, -- various variable names
-    sym("@variable.builtin") { fg = dark_blue }, -- built-in variable names (e.g. `this`)
-    sym("@variable.parameter") { fg = orange }, -- parameters of a function, use a conspicuous color (VSCode uses the common light_blue)
+    -- Syntax: Comments
+    Comment {
+      fg = colors.green,
+      bold = opts.styles.comments.bold,
+      italic = opts.styles.comments.italic,
+      underline = opts.styles.comments.underline,
+      undercurl = opts.styles.comments.undercurl,
+      underdouble = opts.styles.comments.underdouble,
+      strikethrough = opts.styles.comments.strikethrough,
+      reverse = opts.styles.comments.reverse,
+      nocombine = opts.styles.comments.nocombine,
+    }, -- Any comment
+
+    -- Syntax: Constants
+    Constant { fg = colors.dark_blue }, -- (*) Any constant
+    String { fg = colors.brown },       -- A string constant
+    Character { Constant },             -- A character constant
+    Number { fg = colors.light_green }, -- A number constant
+    Boolean { Constant },               -- A boolean constant
+    Float { Number },                   -- A floating point constant
+
+    -- Syntax: Identifiers
+    Identifier {
+      fg = colors.light_blue,
+      bold = opts.styles.variables.bold,
+      italic = opts.styles.variables.italic,
+      underline = opts.styles.variables.underline,
+      undercurl = opts.styles.variables.undercurl,
+      underdouble = opts.styles.variables.underdouble,
+      strikethrough = opts.styles.variables.strikethrough,
+      reverse = opts.styles.variables.reverse,
+      nocombine = opts.styles.variables.nocombine,
+    }, -- Any variable name
+
+    Function {
+      fg = colors.yellow,
+      bold = opts.styles.functions.bold,
+      italic = opts.styles.functions.italic,
+      underline = opts.styles.functions.underline,
+      undercurl = opts.styles.functions.undercurl,
+      underdouble = opts.styles.functions.underdouble,
+      strikethrough = opts.styles.functions.strikethrough,
+      reverse = opts.styles.functions.reverse,
+      nocombine = opts.styles.functions.nocombine,
+    }, -- Function name
+
+    -- Syntax: Statements
+    Statement { fg = colors.pink }, -- Any statement
+    Conditional { Statement },      -- if, then, else, etc.
+    Repeat { Statement },           -- for, do, while, etc.
+    Label { Statement },            -- case, default, etc.
+    Operator { fg = colors.fg },    -- "+", "*", etc.
+    Keyword {
+      fg = colors.dark_blue,
+      bold = opts.styles.keywords.bold,
+      italic = opts.styles.keywords.italic,
+      underline = opts.styles.keywords.underline,
+      undercurl = opts.styles.keywords.undercurl,
+      underdouble = opts.styles.keywords.underdouble,
+      strikethrough = opts.styles.keywords.strikethrough,
+      reverse = opts.styles.keywords.reverse,
+      nocombine = opts.styles.keywords.nocombine,
+    },                       -- any other keyword
+    Exception { Statement }, -- try, catch, throw
+
+    -- Syntax: Preprocessor
+    PreProc { fg = colors.pink }, -- Generic Preprocessor
+    Include { PreProc },          -- Preprocessor #include
+    Define { PreProc },           -- Preprocessor #define
+    Macro { PreProc },            -- Same as Define
+    PreCondit { PreProc },        -- #if, #else, etc.
+
+    -- Syntax: Types
+    Type { fg = colors.dark_blue }, -- int, long, char, etc.
+    StorageClass { Type },          -- static, register, etc.
+    Structure { Type },             -- struct, union, enum, etc.
+    Typedef { Type },               -- A typedef
+
+    -- Syntax: Specials
+    Special { fg = colors.yellow_orange }, -- Any special symbol
+    SpecialChar { Special },               -- Special character in a constant
+    SpecialKey { Special },                -- Unprintable characters: text displayed differently from what it really is. But not 'listchars' whitespace. |hl-Whitespace|
+    Tag { Special },                       -- Tag reference
+    Delimiter { Special },                 -- Character that needs attention
+    SpecialComment { Special },            -- Special things inside a comment
+    Debug { Special },                     -- Debugging statements
+
+    -- Misc
+    Ignore { Normal },                                        -- Hidden
+    Error { fg = colors.error },                              -- Any erroneous construct
+    Todo { fg = colors.bg, bg = colors.orange, bold = true }, -- TODO / FIXME / XXX
+
+    -- LSP: References and CodeLens
+    LspReferenceText { bg = "#343a41" },                            -- Highlighting "text" references
+    LspReferenceRead { bg = "#343a41" },                            -- Highlighting "read" references
+    LspReferenceWrite { bg = "#343a41" },                           -- Highlighting "write" references
+    LspCodeLens { fg = "#999999" },                                 -- Virtual text of the codelens
+    LspCodeLensSeparator { fg = colors.matched },                   -- Separator between multiple code lenses
+    LspSignatureActiveParameter { fg = "#969696", bg = "#292929" }, -- Highlight the active parameter in signature help
+
+    -- Diagnostics: Base Highlights
+    DiagnosticError { fg = colors.error }, -- Base: Error
+    DiagnosticWarn { fg = colors.warn },   -- Base: Warning
+    DiagnosticInfo { fg = colors.info },   -- Base: Info
+    DiagnosticHint { fg = colors.hint },   -- Base: Hint
+    DiagnosticOk { fg = colors.ok },       -- Base: Ok
+
+    -- Diagnostics: Virtual Text
+    DiagnosticVirtualTextError { DiagnosticError, bg = colors.none }, -- Virtual text: Error
+    DiagnosticVirtualTextWarn { DiagnosticWarn, bg = colors.none },   -- Virtual text: Warning
+    DiagnosticVirtualTextInfo { DiagnosticInfo, bg = colors.none },   -- Virtual text: Info
+    DiagnosticVirtualTextHint { DiagnosticHint, bg = colors.none },   -- Virtual text: Hint
+    DiagnosticVirtualTextOk { DiagnosticOk, bg = colors.none },       -- Virtual text: Ok
+
+    -- Diagnostics: Underlines
+    DiagnosticUnderlineError { sp = colors.error, undercurl = true }, -- Underline: Error
+    DiagnosticUnderlineWarn { sp = colors.warn, undercurl = true },   -- Underline: Warning
+    DiagnosticUnderlineInfo { sp = colors.info, undercurl = true },   -- Underline: Info
+    DiagnosticUnderlineHint { sp = colors.hint, undercurl = true },   -- Underline: Hint
+    DiagnosticUnderlineOk { sp = colors.ok, undercurl = true },       -- Underline: Ok
+
+    -- Diagnostics: Floating Windows
+    DiagnosticFloatingError { DiagnosticError }, -- Floating: Error
+    DiagnosticFloatingWarn { DiagnosticWarn },   -- Floating: Warning
+    DiagnosticFloatingInfo { DiagnosticInfo },   -- Floating: Info
+    DiagnosticFloatingHint { DiagnosticHint },   -- Floating: Hint
+    DiagnosticFloatingOk { DiagnosticOk },       -- Floating: Ok
+
+    -- Diagnostics: Signs
+    DiagnosticSignError { DiagnosticError }, -- Sign: Error
+    DiagnosticSignWarn { DiagnosticWarn },   -- Sign: Warning
+    DiagnosticSignInfo { DiagnosticInfo },   -- Sign: Info
+    DiagnosticSignHint { DiagnosticHint },   -- Sign: Hint
+    DiagnosticSignOk { DiagnosticOk },       -- Sign: Ok
+
+    -- Diagnostics: Special
+    DiagnosticUnnecessary { fg = colors.gray2 },
+    DiagnosticDeprecated { fg = colors.gray3, strikethrough = true },
+
+    -- Variables
+    sym("@variable") { fg = colors.light_blue },                       -- various variable names
+    sym("@variable.builtin") { fg = colors.dark_blue },                -- built-in variable names (e.g. `this`)
+    sym("@variable.parameter") { fg = colors.light_blue },             -- parameters of a function
     sym("@variable.parameter.builtin") { sym("@variable.parameter") }, -- special parameters (e.g. `_`, `it`)
-    sym("@variable.member") { fg = light_blue }, -- object and struct fields
+    sym("@variable.member") { fg = colors.light_blue },                -- object and struct fields
 
-    sym("@constant") { Constant }, -- constant identifiers
+    -- Constants
+    sym("@constant") { Constant },         -- constant identifiers
     sym("@constant.builtin") { Constant }, -- built-in constant values
-    sym("@constant.macro") { Constant }, -- constants defined by the preprocessor
+    sym("@constant.macro") { Constant },   -- constants defined by the preprocessor
 
-    sym("@module") { fg = blue_green }, -- modules or namespaces
+    -- Modules & Labels
+    sym("@module") { fg = colors.teal },       -- modules or namespaces
     sym("@module.builtin") { sym("@module") }, -- built-in modules or namespaces
-    sym("@label") { fg = label_fg }, -- GOTO and other labels (e.g. `label:` in C), including heredoc labels
+    sym("@label") { fg = colors.fg_label },    -- GOTO and other labels (e.g. `label:` in C), including heredoc labels
 
-    -- Literals
-    sym("@string") { String }, -- string literals
-    sym("@string.documentation") { fg = brown }, -- string documenting code (e.g. Python docstrings)
-    sym("@string.regexp") { fg = dark_red }, -- regular expressions
-    sym("@string.escape") { fg = yellow_orange }, -- escape sequences
-    sym("@string.special") { SpecialChar }, -- other special strings (e.g. dates)
+    -- Strings
+    sym("@string") { String },                                -- string literals
+    sym("@string.documentation") { String },                  -- string documenting code (e.g. Python docstrings)
+    sym("@string.regexp") { fg = colors.red },                -- regular expressions
+    sym("@string.escape") { fg = colors.yellow_orange },      -- escape sequences
+    sym("@string.special") { SpecialChar },                   -- other special strings (e.g. dates)
     sym("@string.special.symbol") { sym("@string.special") }, -- symbols or atoms
-    sym("@string.special.url") { sym("@string.special") }, -- URIs (e.g. hyperlinks), it's url outside markup
-    sym("@string.special.path") { sym("@string.special") }, -- filenames
+    sym("@string.special.url") { sym("@string.special") },    -- URIs (e.g. hyperlinks)
+    sym("@string.special.path") { sym("@string.special") },   -- filenames
 
-    sym("@character") { Character }, -- character literals
+    -- Characters
+    sym("@character") { Character },           -- character literals
     sym("@character.special") { SpecialChar }, -- special characters (e.g. wildcards)
 
-    sym("@boolean") { Boolean }, -- boolean literals
-    sym("@number")  { Number }, -- numeric literals
+    -- Booleans and Numbers
+    sym("@boolean") { Boolean },    -- boolean literals
+    sym("@number") { Number },      -- numeric literals
     sym("@number.float") { Float }, -- floating-point number literals
 
     -- Types
-    sym("@type") { fg = blue_green }, -- type or class definitions and annotations
-    sym("@type.builtin") { fg = dark_blue }, -- built-in types
-    sym("@type.definition") { fg = blue_green }, -- identifiers in type definitions (e.g. `typedef <type> <identifier>` in C)
+    sym("@type") { fg = colors.teal },              -- type or class definitions and annotations
+    sym("@type.builtin") { fg = colors.dark_blue }, -- built-in types
+    sym("@type.definition") { fg = colors.teal },   -- identifiers in type definitions (e.g. `typedef <type> <identifier>` in C)
 
-    sym("@attribute") { fg = blue_green }, -- attribute annotations (e.g. Python decorators)
+    -- Attributes & Property
+    sym("@attribute") { fg = colors.teal },          -- attribute annotations (e.g. Python decorators, Rust lifetimes)
     sym("@attribute.builtin") { sym("@attribute") }, -- builtin annotations (e.g. `@property` in Python)
-    sym("@property") { sym("@variable.member") }, -- the key in key/value pairs
+    sym("@property") { sym("@variable.member") },    -- the key in key/value pairs
 
-    -- Function
-    sym("@function") { Function }, -- function definitions
-    sym("@function.builtin") { Function }, -- built-in functions
-    sym("@function.call") { Function }, -- function calls
-    sym("@function.macro") { Function }, -- preprocessor macros
-
-    sym("@function.method") { sym("@function") }, -- method definitions
+    -- Functions & Methods
+    sym("@function") { Function },                          -- function definitions
+    sym("@function.builtin") { Function },                  -- built-in functions
+    sym("@function.call") { Function },                     -- function calls
+    sym("@function.macro") { Function },                    -- preprocessor macros
+    sym("@function.method") { sym("@function") },           -- method definitions
     sym("@function.method.call") { sym("@function.call") }, -- method calls
+    sym("@constructor") { sym("@function") },               -- constructor calls and definitions
 
-    sym("@constructor") { fg = blue_green }, -- constructor calls and definitions
-    sym("@operator") { Operator }, -- symbolic operators (e.g. `+` / `*`)
-
-    -- Keyword
-    sym("@keyword") { Keyword }, -- keywords not fitting into specific categories
-    sym("@keyword.coroutine") { fg = dark_pink }, -- keywords related to coroutines (e.g. `go` in Go, `async/await` in Python)
-    sym("@keyword.function") { fg = dark_blue }, -- keywords that define a function (e.g. `func` in Go, `def` in Python)
-    sym("@keyword.operator") { sym("@operator") }, -- operators that are English words (e.g. `and` / `or`)
-    sym("@keyword.import") { Include }, -- keywords for including modules (e.g. `import` / `from` in Python)
-    sym("@keyword.type") { fg = dark_blue }, -- keywords describing composite types (e.g. `struct`, `enum`)
-    sym("@keyword.modifier") { fg = dark_blue }, -- keywords modifying other constructs (e.g. `const`, `static`, `public`)
-    sym("@keyword.repeat") { Repeat }, -- keywords related to loops (e.g. `for` / `while`)
-    sym("@keyword.return") { fg = dark_pink }, --  keywords like `return` and `yield`
-    sym("@keyword.debug") { Debug }, -- keywords related to debugging
-    sym("@keyword.exception") { Exception }, -- keywords related to exceptions (e.g. `throw` / `catch`)
-
-    sym("@keyword.conditional") { Conditional }, -- keywords related to conditionals (e.g. `if` / `else`)
-    sym("@keyword.conditional.ternary") { sym("@operator") }, -- ternary operator (e.g. `?` / `:`)
-
-    sym("@keyword.directive") { PreProc }, -- various preprocessor directives & shebangs
+    -- Operators & Keywords
+    sym("@operator") { Operator },                                  -- symbolic operators (e.g. `+` / `*`)
+    sym("@keyword") { Keyword },                                    -- keywords not fitting into specific categories
+    sym("@keyword.coroutine") { fg = colors.pink },                 -- keywords related to coroutines (e.g. `go` in Go, `async/await` in Python)
+    sym("@keyword.function") { fg = colors.dark_blue },             -- keywords that define a function (e.g. `func` in Go, `def` in Python)
+    sym("@keyword.operator") { fg = colors.pink },                  -- operators that are English words (e.g. `and` / `or`)
+    sym("@keyword.import") { Include },                             -- keywords for including or exporting modules (e.g. `import` / `from` in Python)
+    sym("@keyword.type") { fg = colors.dark_blue },                 -- keywords describing namespaces and composite types (e.g. `struct`, `enum`)
+    sym("@keyword.modifier") { fg = colors.dark_blue },             -- keywords modifying other constructs (e.g. `const`, `static`, `public`)
+    sym("@keyword.repeat") { Repeat },                              -- keywords related to loops (e.g. `for` / `while`)
+    sym("@keyword.return") { fg = colors.pink },                    -- keywords like `return` and `yield`
+    sym("@keyword.debug") { Debug },                                -- keywords related to debugging
+    sym("@keyword.exception") { Exception },                        -- keywords related to exceptions (e.g. `throw` / `catch`)
+    sym("@keyword.conditional") { Conditional },                    -- keywords related to conditionals (e.g. `if` / `else`)
+    sym("@keyword.conditional.ternary") { sym("@operator") },       -- ternary operator (e.g. `?` / `:`)
+    sym("@keyword.directive") { PreProc },                          -- various preprocessor directives & shebangs
     sym("@keyword.directive.define") { sym("@keyword.directive") }, -- preprocessor definition directives
 
     -- Punctuation
-    sym("@punctuation.delimiter") { fg = norm_fg }, -- delimiters (e.g. `;` / `.` / `,`)
-    sym("@punctuation.bracket") { fg = norm_fg }, -- brackets (e.g. `()` / `{}` / `[]`)
-    sym("@punctuation.special") { fg = dark_blue }, -- special symbols (e.g. `{}` in string interpolation)
+    sym("@punctuation.delimiter") { fg = colors.fg },      -- delimiters (e.g. `;` / `.` / `,`)
+    sym("@punctuation.bracket") { fg = colors.fg },        -- brackets (e.g. `()` / `{}` / `[]`)
+    sym("@punctuation.special") { fg = colors.dark_blue }, -- special symbols (e.g. `{}` in string interpolation)
 
     -- Comments
-    sym("@comment") { Comment }, -- line and block comments
+    sym("@comment") { Comment },                       -- line and block comments
     sym("@comment.documentation") { sym("@comment") }, -- comments documenting code
+    sym("@comment.error") { fg = colors.error, },      -- error-type comments (e.g. `ERROR`, `FIXME`, `DEPRECATED`)
+    sym("@comment.warning") { fg = colors.warn },      -- warning-type comments (e.g. `WARNING`, `FIX`, `HACK`)
+    sym("@comment.todo") { Todo },                     -- todo-type comments (e.g. `TODO`, `WIP`)
+    sym("@comment.note") { fg = colors.info },         -- note-type comments (e.g. `NOTE`, `INFO`, `XXX`)
 
-    sym("@comment.error") { fg = error_red }, -- error-type comments (e.g., `DEPRECATED:`)
-    sym("@comment.warning") { fg = warn_yellow }, -- warning-type comments (e.g., `WARNING:`, `FIX:`)
-    sym("@comment.hint") { fg = hint_gray },  -- note-type comments (e.g., `NOTE:`)
-    sym("@comment.info") { fg = info_blue }, -- info-type comments
-    sym("@comment.todo") { Todo }, -- todo-type comments (e.g-, `TODO:`, `WIP:`)
+    -- Markup & TextFormatting
+    sym("@markup.strong") { fg = colors.fg, bold = true },                 -- bold text
+    sym("@markup.italic") { fg = colors.fg, italic = true },               -- italic text
+    sym("@markup.strikethrough") { fg = colors.fg, strikethrough = true }, -- struck-through text
+    sym("@markup.underline") { fg = colors.fg, underline = true },         -- underlined text (only for literal underline markup!)
 
-    -- Markup
-    sym("@markup.strong") { fg = norm_fg, gui = 'bold' }, -- bold text
-    sym("@markup.italic") { fg = norm_fg, gui = 'italic' }, -- text with emphasis
-    sym("@markup.strikethrough") { fg = norm_fg, gui = 'strikethrough' }, -- strikethrough text
-    sym("@markup.underline") { fg = norm_fg, gui = 'underline' }, -- underlined text (only for literal underline markup!)
+    sym("@markup.heading") { Title },                                      -- headings, titles (including markers)
+    sym("@markup.heading.1") { fg = colors.cornflower, bold = true },      -- top-level heading
+    sym("@markup.heading.2") { fg = colors.green, bold = true },           -- section heading
+    sym("@markup.heading.3") { fg = colors.dark_blue, bold = true },       -- subsection heading
+    sym("@markup.heading.4") { fg = colors.red, bold = true },             -- and so on
+    sym("@markup.heading.5") { fg = colors.yellow, bold = true },          -- and so forth
+    sym("@markup.heading.6") { fg = colors.pink, bold = true },            -- six levels ought to be enough for anybody
 
-    sym("@markup.heading") { Title }, -- headings, titles (including markers)
-    sym("@markup.heading.1") { sym("@markup.heading") },
-    sym("@markup.heading.2") { sym("@markup.heading") },
-    sym("@markup.heading.3") { sym("@markup.heading") },
-    sym("@markup.heading.4") { sym("@markup.heading") },
-    sym("@markup.heading.5") { sym("@markup.heading") },
-    sym("@markup.heading.6") { sym("@markup.heading") },
+    sym("@markup.quote") { fg = colors.violet },                           -- block quotes
+    sym("@markup.math") { fg = colors.teal },                              -- math environments (e.g. `$ ... $` in LaTeX)
 
-    sym("@markup.quote") { fg = green }, -- block quotes
-    sym("@markup.math") { fg = blue_green }, -- math environments (e.g. `$ ... $` in LaTeX)
+    sym("@markup.link") { fg = colors.fg },                                -- text references, footnotes, citations, etc.
+    sym("@markup.link.label") { fg = colors.brown },                       -- link, reference descriptions
+    sym("@markup.link.url") { fg = colors.dark_blue, underline = true },   -- URL-style links
 
-    sym("@markup.link") { fg = brown }, -- text references, footnotes, citations, etc.
-    sym("@markup.link.label") { sym("@markup.link") }, -- non-url links
-    sym("@markup.link.url") { sym("@markup.link") }, -- url links in markup
+    sym("@markup.raw") { fg = colors.brown },                              -- literal or verbatim text (e.g. inline code)
+    sym("@markup.raw.block") { fg = colors.fg },                           -- literal or verbatim text as a stand-alone block (use priority 90 for blocks with injections)
 
-    sym("@markup.raw") { fg = brown }, -- literal or verbatim text (e.g., inline code)
-    sym("@markup.raw.block") { fg = norm_fg }, -- literal or verbatim text as a stand-alone block
+    sym("@markup.list") { fg = colors.cornflower },                        -- list markers
+    sym("@markup.list.checked") { sym("@markup.list") },                   -- checked todo-style list markers
+    sym("@markup.list.unchecked") { sym("@markup.list") },                 -- unchecked todo-style list markers
 
-    sym("@markup.list") { fg = cornflower_blue }, -- list markers
-    -- sym("@markup.list.checked") { }, -- checked todo-style list markers
-    -- sym("@markup.list.unchecked") { }, -- unchecked todo-style list markers
-
-    sym("@diff.plus") { DiffTextAdded }, -- added text (for diff files)
+    -- Diff Markup (for version control)
+    sym("@diff.plus") { DiffTextAdded },    -- added text (for diff files)
     sym("@diff.minus") { DiffTextDeleted }, -- deleted text (for diff files)
     sym("@diff.delta") { DiffTextChanged }, -- changed text (for diff files)
 
-    sym("@tag") { fg = dark_blue }, -- XML tag names
-    sym("@tag.builtin") { sym("@tag") }, -- builtin tag names (e.g. HTML5 tags)
-    sym("@tag.attribute") { fg = light_blue }, -- XML tag attributes
-    sym("@tag.delimiter") { fg = gray3 }, -- XML tag delimiters
+    -- Tags (e.g. HTML, XML)
+    sym("@tag") { fg = colors.dark_blue },            -- XML-style tag names (and similar)
+    sym("@tag.builtin") { sym("@tag") },              -- builtin tag names (e.g. HTML5 tags)
+    sym("@tag.attribute") { fg = colors.light_blue }, -- XML-style tag attributes
+    sym("@tag.delimiter") { fg = colors.gray3 },      -- XML-style tag delimiters
 
-    -- Language specific
+    sym("@conceal") { fg = colors.gray1 },            -- captures that are only meant to be concealed
+
+    -- sym("(function_definition) @fold"){}, -- fold this node
+
+    -- sym("@local.definition"){}, -- various definitions
+    -- sym("@local.definition.constant"){}, -- constants
+    -- sym("@local.definition.function"){}, -- functions
+    -- sym("@local.definition.method"){}, -- methods
+    -- sym("@local.definition.var"){}, -- variables
+    -- sym("@local.definition.parameter"){}, -- parameters
+    -- sym("@local.definition.macro"){}, -- preprocessor macros
+    -- sym("@local.definition.type"){}, -- types or classes
+    -- sym("@local.definition.field"){}, -- fields or properties
+    -- sym("@local.definition.enum"){}, -- enumerations
+    -- sym("@local.definition.namespace"){}, -- modules or namespaces
+    -- sym("@local.definition.import"){}, -- imported names
+    -- sym("@local.definition.associated"){}, -- the associated type of a variable
+
+    -- sym("@local.scope"){}, -- scope block
+    -- sym("@local.reference"){}, -- identifier reference
+
+    -- LSP Semantic Tokens
+    sym("@lsp.type.namespace") { sym("@module") },               -- Namespace, module, or package grouping
+    sym("@lsp.type.type") { sym("@type") },                      -- Type entity (class, struct, interface)
+    sym("@lsp.type.class") { sym("@type") },                     -- Class type
+    sym("@lsp.type.enum") { sym("@type") },                      -- Enumeration type
+    sym("@lsp.type.interface") { sym("@type") },                 -- Interface type
+    sym("@lsp.type.struct") { sym("@type") },                    -- Struct type
+    sym("@lsp.type.typeParameter") { sym("@type.definition") },  -- Generic type parameter
+    sym("@lsp.type.parameter") { sym("@variable.parameter") },   -- Function or method parameter
+    sym("@lsp.type.variable") { sym("@variable") },              -- Variable
+    sym("@lsp.type.property") { sym("@property") },              -- Object or class property
+    sym("@lsp.type.enumMember") { fg = colors.blue },            -- Enumeration member
+    sym("@lsp.type.event") { sym("@type") },                     -- Event type
+    sym("@lsp.type.function") { sym("@function") },              -- Function
+    sym("@lsp.type.method") { sym("@function") },                -- Method of a class or object
+    sym("@lsp.type.macro") { sym("@constant.macro") },           -- Macro
+    sym("@lsp.type.keyword") { sym("@keyword") },                -- Language keyword
+    sym("@lsp.type.comment") { sym("@comment") },                -- Comment text
+    sym("@lsp.type.string") { sym("@string") },                  -- String literal
+    sym("@lsp.type.number") { sym("@number") },                  -- Number literal
+    sym("@lsp.type.regexp") { sym("@string.regexp") },           -- Regular expression literal
+    sym("@lsp.type.operator") { sym("@operator") },              -- Operator symbol
+    sym("@lsp.type.decorator") { sym("@attribute") },            -- Decorator or annotation
+    sym("@lsp.type.escapeSequence") { sym("@string.escape") },   -- Escape sequence inside strings
+    sym("@lsp.type.formatSpecifier") { fg = colors.light_blue }, -- Format specifier (e.g., printf style)
+
+    -- Built-in specific LSP types
+    sym("@lsp.type.builtinType") { sym("@type.builtin") },                        -- Built-in type (e.g., int, float)
+    sym("@lsp.type.typeAlias") { sym("@type.definition") },                       -- Type alias
+    sym("@lsp.type.unresolvedReference") { sp = colors.error, undercurl = true }, -- Unresolved reference or symbol
+    sym("@lsp.type.lifetime") { sym("@keyword.modifier") },                       -- Lifetime specifier (e.g., Rust)
+    sym("@lsp.type.generic") { sym("@variable") },                                -- Generic type or template
+    sym("@lsp.type.selfKeyword") { sym("@variable.builtin") },                    -- Self keyword (e.g., this/self)
+    sym("@lsp.type.selfTypeKeyword") { sym("@variable.builtin") },                -- Self type keyword
+    sym("@lsp.type.deriveHelper") { sym("@attribute") },                          -- Derive helper (e.g., Rust derive macros)
+    sym("@lsp.type.modifier") { sym("@keyword.modifier") },                       -- Modifier keyword (e.g., public, static)
+
+    -- LSP Modifiers
+    sym("@lsp.mod.abstract") { fg = colors.pink, italic = true },           -- Abstract members (soft purple)
+    sym("@lsp.mod.async") { fg = colors.dark_blue, italic = true },         -- Async functions (blue)
+    sym("@lsp.mod.declaration") { fg = colors.yellow },                     -- Declarations (light yellow)
+    sym("@lsp.mod.defaultLibrary") { fg = colors.teal, italic = true },     -- From standard library (aqua)
+    sym("@lsp.mod.definition") { fg = colors.light_blue },                  -- Definitions (bright blue)
+    sym("@lsp.mod.deprecated") { fg = colors.gray3, strikethrough = true }, -- Deprecated (gray & strikethrough)
+    sym("@lsp.mod.documentation") { fg = colors.green, italic = true },     -- Documentation (green, italic)
+    sym("@lsp.mod.modification") { fg = colors.brown },                     -- Modifying variable (orange)
+    sym("@lsp.mod.readonly") { fg = colors.blue },                          -- Readonly variable (bright blue, bold)
+    sym("@lsp.mod.static") { fg = colors.dark_blue, italic = true },        -- Static members (red)
+
+    -- LSP Type Modifiers, metadata about the types for semantic tooling
+    sym("@lsp.typemod.type.defaultLibrary") { sym("@type.builtin") },           -- Type from default library
+    sym("@lsp.typemod.typeAlias.defaultLibrary") { sym("@type.builtin") },      -- Type alias from default library
+    sym("@lsp.typemod.class.defaultLibrary") { sym("@type") },                  -- Class from default library
+    sym("@lsp.typemod.variable.defaultLibrary") { sym("@variable.builtin") },   -- Variable from default library
+    sym("@lsp.typemod.function.defaultLibrary") { sym("@function.builtin") },   -- Function from default library
+    sym("@lsp.typemod.method.defaultLibrary") { sym("@function.builtin") },     -- Method from default library
+    sym("@lsp.typemod.macro.defaultLibrary") { sym("@function.builtin") },      -- Macro from default library
+    sym("@lsp.typemod.struct.defaultLibrary") { sym("@type.builtin") },         -- Struct from default library
+    sym("@lsp.typemod.enum.defaultLibrary") { sym("@type.builtin") },           -- Enum from default library
+    sym("@lsp.typemod.enumMember.defaultLibrary") { sym("@constant.builtin") }, -- Enum member from default library
+    sym("@lsp.typemod.variable.readonly") { fg = colors.blue },                 -- Read-only variable
+    sym("@lsp.typemod.variable.callable") { sym("@function") },                 -- Callable variable (e.g., function pointer)
+    sym("@lsp.typemod.variable.static") { sym("@constant") },                   -- Static variable
+    sym("@lsp.typemod.property.readonly") { fg = colors.blue },                 -- Read-only property
+    sym("@lsp.typemod.keyword.async") { sym("@keyword.coroutine") },            -- Async keyword
+
+    sym("@lsp.typemod.keyword.injected") { sym("@keyword") },                   -- Injected keyword (e.g., via dependency injection)
+    sym("@lsp.typemod.operator.injected")({ sym("@operator") }),                -- Injected operator by tooling
+    sym("@lsp.typemod.string.injected")({ sym("@string") }),                    -- Injected string (e.g., in templates)
+    sym("@lsp.typemod.variable.injected")({ sym("@variable") }),                -- Injected variable by tooling
+
+    -- Language Specific
     -- Lua
-    sym("@variable.member.lua") { fg = blue_green },
+    sym("@variable.member.lua") { fg = colors.teal },              -- Object and struct fields in lua
+    sym("@lsp.type.property.lua") { sym("@variable.member.lua") }, -- Object or class property in lua
 
-    --
-    -- LSP semantic tokens
-    --
-    -- The help page :h lsp-semantic-highlight
-    -- A short guide: https://gist.github.com/swarn/fb37d9eefe1bc616c2a7e476c0bc0316
-    -- Token types and modifiers are described here: http://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
-    sym("@lsp.type.namespace") { sym("@module") },
-    sym("@lsp.type.type") { sym("@type") },
-    sym("@lsp.type.class") { sym("@type") },
-    sym("@lsp.type.enum") { sym("@keyword.type") },
-    sym("@lsp.type.interface") { sym("@type") },
-    sym("@lsp.type.struct") { sym("@type") },
-    sym("@lsp.type.typeParameter") { sym("@type.definition") },
-    sym("@lsp.type.parameter") { sym("@variable.parameter") },
-    sym("@lsp.type.variable") { sym("@variable") },
-    sym("@lsp.type.property") { sym("@property") },
-    sym("@lsp.type.enumMember") { fg = blue },
-    sym("@lsp.type.event") { sym("@type") },
-    sym("@lsp.type.function") { sym("@function") },
-    sym("@lsp.type.method") { sym("@function") },
-    sym("@lsp.type.macro") { sym("@constant.macro") },
-    sym("@lsp.type.keyword") { sym("@keyword") },
-    sym("@lsp.type.comment") { sym("@comment") },
-    sym("@lsp.type.string") { sym("@string") },
-    sym("@lsp.type.number") { sym("@number") },
-    sym("@lsp.type.regexp") { sym("@string.regexp") },
-    sym("@lsp.type.operator") { sym("@operator") },
-    sym("@lsp.type.decorator") { sym("@attribute") },
-    sym("@lsp.type.escapeSequence") { sym("@string.escape") },
-    sym("@lsp.type.formatSpecifier") { fg = light_blue },
-    sym("@lsp.type.builtinType") { sym("@type.builtin") },
-    sym("@lsp.type.typeAlias") { sym("@type.definition") },
-    sym("@lsp.type.unresolvedReference") { gui = 'undercurl', sp = error_red },
-    sym("@lsp.type.lifetime") { sym("@keyword.modifier") },
-    sym("@lsp.type.generic") { sym("@variable") },
-    sym("@lsp.type.selfKeyword") { sym("@variable.builtin") },
-    sym("@lsp.type.selfTypeKeyword") { sym("@variable.builtin") },
-    sym("@lsp.type.deriveHelper") { sym("@attribute") },
-    sym("@lsp.type.modifier") { sym("@keyword.modifier") },
-    sym("@lsp.typemod.type.defaultLibrary") { sym("@type.builtin") },
-    sym("@lsp.typemod.typeAlias.defaultLibrary") { sym("@type.builtin") },
-    sym("@lsp.typemod.class.defaultLibrary") { sym("@type.builtin") },
-    sym("@lsp.typemod.variable.defaultLibrary") { sym("@variable.builtin") },
-    sym("@lsp.typemod.function.defaultLibrary") { sym("@function.builtin") },
-    sym("@lsp.typemod.method.defaultLibrary") { sym("@function.builtin") },
-    sym("@lsp.typemod.macro.defaultLibrary") { sym("@function.builtin") },
-    sym("@lsp.typemod.struct.defaultLibrary") { sym("@type.builtin") },
-    sym("@lsp.typemod.enum.defaultLibrary") { sym("@type.builtin") },
-    sym("@lsp.typemod.enumMember.defaultLibrary") { sym("@constant.builtin") },
-    sym("@lsp.typemod.variable.readonly") { fg = blue },
-    sym("@lsp.typemod.variable.callable") { sym("@function") },
-    sym("@lsp.typemod.variable.static") { sym("@constant") },
-    sym("@lsp.typemod.property.readonly") { fg = blue },
-    sym("@lsp.typemod.keyword.async") { sym("@keyword.coroutine") },
-    sym("@lsp.typemod.keyword.injected") { sym("@keyword") },
-    -- Set injected highlights. Mainly for Rust doc comments and also works for
-    -- other lsps that inject tokens in comments.
-    -- Ref: https://github.com/folke/tokyonight.nvim/pull/340
-    sym("@lsp.typemod.operator.injected") { sym("@operator") },
-    sym("@lsp.typemod.string.injected") { sym("@string") },
-    sym("@lsp.typemod.variable.injected") { sym("@variable") },
+    -- Python
+    sym("@type.builtin.python") { sym("@type") },         -- built-in types
+    sym("@lsp.type.builtinType.python") { sym("@type") }, -- Built-in type (e.g., int, float)
 
-    -- Language specific
-    -- Lua
-    sym("@lsp.type.property.lua") { sym("@variable.member.lua") },
+    -- Markdown
+    sym("@label.markdown") { fg = colors.pink },                      -- GOTO and other labels, including heredoc labels
+    sym("@markup.raw.markdown_inline") { fg = colors.yellow_orange }, -- GOTO and other labels, including heredoc labels
 
-    --
-    -- nvim-lspconfig
-    --
-    -- LspInfoTitle { },
-    -- LspInfoList { },
-    -- LspInfoFiletype { },
-    -- LspInfoTip { },
-    LspInfoBorder { FloatBorder },
+    -- Vimdoc
+    sym("@label.vimdoc") { fg = colors.red, italic = true, underline = true }, -- GOTO and other labels, including heredoc labels
 
-    --
-    -- nvim-cmp
-    --
-    CmpItemAbbrDeprecated { fg = gray3, bg = 'NONE', gui = 'strikethrough' },
-    CmpItemAbbrMatch { fg = matched_chars, bg = 'NONE' },
-    CmpItemAbbrMatchFuzzy { CmpItemAbbrMatch },
-    CmpItemMenu { Description },
-    CmpItemKindText { SymbolKindText },
-    CmpItemKindMethod { SymbolKindMethod },
-    CmpItemKindFunction { SymbolKindFunction },
-    CmpItemKindConstructor { SymbolKindConstructor },
-    CmpItemKindField { SymbolKindField },
-    CmpItemKindVariable { SymbolKindVariable },
-    CmpItemKindClass { SymbolKindClass },
-    CmpItemKindInterface { SymbolKindInterface },
-    CmpItemKindModule { SymbolKindModule },
-    CmpItemKindProperty { SymbolKindProperty },
-    CmpItemKindUnit { SymbolKindUnit },
-    CmpItemKindValue { SymbolKindValue },
-    CmpItemKindEnum { SymbolKindEnum },
-    CmpItemKindKeyword { SymbolKindKeyword },
-    CmpItemKindSnippet { SymbolKindSnippet },
-    CmpItemKindColor { SymbolKindColor },
-    CmpItemKindFile { SymbolKindFile },
-    CmpItemKindReference { SymbolKindReference },
-    CmpItemKindFolder { SymbolKindFolder },
-    CmpItemKindEnumMember { SymbolKindEnumMember },
-    CmpItemKindConstant { SymbolKindConstant },
-    CmpItemKindStruct { SymbolKindStruct },
-    CmpItemKindEvent { SymbolKindEvent },
-    CmpItemKindOperator { SymbolKindOperator },
-    CmpItemKindTypeParameter { SymbolKindTypeParameter },
-    -- Other kinds from VSCode's symbolIcon.*
-    CmpItemKindArray { SymbolKindArray },
-    CmpItemKindBoolean { SymbolKindBoolean },
-    CmpItemKindKey { SymbolKindKey },
-    CmpItemKindNamespace { SymbolKindNamespace },
-    CmpItemKindString { SymbolKindString },
-    CmpItemKindNull { SymbolKindNull },
-    CmpItemKindNumber { SymbolKindNumber },
-    CmpItemKindObject { SymbolKindObject },
-    CmpItemKindPackage { SymbolKindPackage },
-    -- Predefined for the winhighlight config of cmp float window
-    SuggestWidgetBorder { FloatBorder },
-    SuggestWidgetSelect { bg = selected_item_bg },
+    -- SymbolKind
+    SymbolKindText { fg = "#cccccc", bg = colors.none },   -- Default text style (fallback)
+    SymbolKindMethod { fg = "#b180d7", bg = colors.none }, -- Instance methods
+    SymbolKindFunction { SymbolKindMethod },               -- Functions (same as methods)
+    SymbolKindField { fg = "#75beff", bg = colors.none },  -- Class/struct fields
+    SymbolKindVariable { SymbolKindField },                -- Variables (same as fields)
+    SymbolKindClass { fg = "#ee9d28", bg = colors.none },  -- Classes / user-defined types
+    SymbolKindInterface { SymbolKindField },               -- Interfaces (same as fields)
+    SymbolKindModule { SymbolKindText },                   -- Modules / containers
+    SymbolKindProperty { SymbolKindText },                 -- Object properties
+    SymbolKindUnit { SymbolKindText },                     -- Unit types
+    SymbolKindValue { SymbolKindText },                    -- Values / constants
+    SymbolKindEnum { SymbolKindClass },                    -- Enums (styled as classes)
+    SymbolKindKeyword { SymbolKindText },                  -- Language keywords
+    SymbolKindSnippet { SymbolKindText },                  -- Code snippets
+    SymbolKindColor { SymbolKindText },                    -- Color literals
+    SymbolKindFile { SymbolKindText },                     -- Files
+    SymbolKindReference { SymbolKindText },                -- References / aliases
+    SymbolKindFolder { SymbolKindText },                   -- Folders / directories
+    SymbolKindEnumMember { SymbolKindField },              -- Enum members (same as fields)
+    SymbolKindConstant { SymbolKindText },                 -- Constants
+    SymbolKindStruct { SymbolKindText },                   -- Structs
+    SymbolKindEvent { SymbolKindClass },                   -- Events (styled as classes)
+    SymbolKindOperator { SymbolKindText },                 -- Operators (+, -, etc.)
+    SymbolKindTypeParameter { SymbolKindText },            -- Generic type parameters
+    SymbolKindArray { SymbolKindText },                    -- Arrays
+    SymbolKindBoolean { SymbolKindText },                  -- Boolean literals
+    SymbolKindKey { SymbolKindText },                      -- Keys in key-value pairs
+    SymbolKindNamespace { SymbolKindText },                -- Namespaces
+    SymbolKindString { SymbolKindText },                   -- String literals
+    SymbolKindNull { SymbolKindText },                     -- Null / nil literals
+    SymbolKindNumber { SymbolKindText },                   -- Number literals
+    SymbolKindObject { SymbolKindText },                   -- Generic objects
+    SymbolKindPackage { SymbolKindText },                  -- Packages / dependencies
 
-    --
-    -- blink.cmp
-    --
-    -- Completion menu window
-    BlinkCmpMenu { Normal },
-    BlinkCmpMenuBorder { FloatBorder },
-    BlinkCmpMenuSelection { bg = selected_item_bg, gui = 'bold' },
-    BlinkCmpScrollBarThumb { ScrollbarSlider },
-    BlinkCmpScrollBarGutter { ScrollbarGutter },
-    -- Document window
-    BlinkCmpDoc { BlinkCmpMenu },
-    BlinkCmpDocBorder { BlinkCmpMenuBorder },
-    BlinkCmpDocSeparator { BlinkCmpDocBorder },
-    BlinkCmpDocCursorLine { BlinkCmpMenuSelection },
-    -- Signature help window
-    BlinkCmpSignatureHelp { BlinkCmpMenu },
-    BlinkCmpSignatureHelpBorder { BlinkCmpMenuBorder },
-    BlinkCmpSignatureHelpActiveParameter { LspSignatureActiveParameter },
-    -- Label
-    BlinkCmpLabel { fg = norm_fg },
-    BlinkCmpLabelDeprecated { fg = gray3, bg = 'NONE', gui = 'strikethrough' },
-    BlinkCmpLabelMatch { fg = matched_chars, bg = 'NONE', gui = 'bold' },
-    BlinkCmpLabelDetail { fg = gray3, bg = 'NONE' },
-    BlinkCmpLabelDescription { BlinkCmpLabelDetail },
-    -- Source
-    BlinkCmpSource { BlinkCmpLabelDetail },
-    BlinkCmpGhostText { BlinkCmpLabelDetail },
-    -- Kinds
-    BlinkCmpKindText { SymbolKindText },
-    BlinkCmpKindMethod { SymbolKindMethod },
-    BlinkCmpKindFunction { SymbolKindFunction },
-    BlinkCmpKindConstructor { SymbolKindConstructor },
-    BlinkCmpKindField { SymbolKindField },
-    BlinkCmpKindVariable { SymbolKindVariable },
-    BlinkCmpKindClass { SymbolKindClass },
-    BlinkCmpKindInterface { SymbolKindInterface },
-    BlinkCmpKindModule { SymbolKindModule },
-    BlinkCmpKindProperty { SymbolKindProperty },
-    BlinkCmpKindUnit { SymbolKindUnit },
-    BlinkCmpKindValue { SymbolKindValue },
-    BlinkCmpKindEnum { SymbolKindEnum },
-    BlinkCmpKindKeyword { SymbolKindKeyword },
-    BlinkCmpKindSnippet { SymbolKindSnippet },
-    BlinkCmpKindColor { SymbolKindColor },
-    BlinkCmpKindFile { SymbolKindFile },
-    BlinkCmpKindReference { SymbolKindReference },
-    BlinkCmpKindFolder { SymbolKindFolder },
-    BlinkCmpKindEnumMember { SymbolKindEnumMember },
-    BlinkCmpKindConstant { SymbolKindConstant },
-    BlinkCmpKindStruct { SymbolKindStruct },
-    BlinkCmpKindEvent { SymbolKindEvent },
-    BlinkCmpKindOperator { SymbolKindOperator },
-    BlinkCmpKindTypeParameter { SymbolKindTypeParameter },
-    -- Other kinds from VSCode's symbolIcon.*
-    BlinkCmpKindArray { SymbolKindArray },
-    BlinkCmpKindBoolean { SymbolKindBoolean },
-    BlinkCmpKindKey { SymbolKindKey },
-    BlinkCmpKindNamespace { SymbolKindNamespace },
-    BlinkCmpKindString { SymbolKindString },
-    BlinkCmpKindNull { SymbolKindNull },
-    BlinkCmpKindNumber { SymbolKindNumber },
-    BlinkCmpKindObject { SymbolKindObject },
-    BlinkCmpKindPackage { SymbolKindPackage },
+    -- Indent Blankline
+    IblIndent { fg = colors.indent_guide }, -- Indent Blankline: Indent Guide
+    IblScope { fg = colors.indent_scope },  -- Indent Blankline: Indent Scope
 
-    --
-    -- Aerial
-    --
-    AerialTextIcon { CmpItemKindText },
-    AerialMethodIcon { CmpItemKindMethod },
-    AerialFunctionIcon { CmpItemKindFunction },
-    AerialConstructorIcon { CmpItemKindConstructor },
-    AerialFieldIcon { CmpItemKindField },
-    AerialVariableIcon { CmpItemKindVariable },
-    AerialClassIcon { CmpItemKindClass },
-    AerialInterfaceIcon { CmpItemKindInterface },
-    AerialModuleIcon { CmpItemKindModule },
-    AerialPropertyIcon { CmpItemKindProperty },
-    AerialUnitIcon { CmpItemKindUnit },
-    AerialValueIcon { CmpItemKindValue },
-    AerialEnumIcon { CmpItemKindEnum },
-    AerialKeywordIcon { CmpItemKindKeyword },
-    AerialSnippetIcon { CmpItemKindSnippet },
-    AerialColorIcon { CmpItemKindColor },
-    AerialFileIcon { CmpItemKindFile },
-    AerialReferenceIcon { CmpItemKindReference },
-    AerialFolderIcon { CmpItemKindFolder },
-    AerialEnumMemberIcon { CmpItemKindEnumMember },
-    AerialConstantIcon { CmpItemKindConstant },
-    AerialStructIcon { CmpItemKindStruct },
-    AerialEventIcon { CmpItemKindEvent },
-    AerialOperatorIcon { CmpItemKindOperator },
-    AerialTypeParameterIcon { CmpItemKindTypeParameter },
+    -- Rainbow Delimiters
+    RainbowDelimiterYellow { fg = "#e8ba36" }, -- Rainbow Delimiters: Yellow
+    RainbowDelimiterGreen { fg = "#54a857" },  -- Rainbow Delimiters: Green
+    RainbowDelimiterBlue { fg = "#359ff4" },   -- Rainbow Delimiters: Blue
+    RainbowDelimiterViolet { fg = "#6e7ed9" }, -- Rainbow Delimiters: Violet
+    RainbowDelimiterCyan { fg = "#4ec9b0" },   -- Rainbow Delimiters: Cyan
+    RainbowDelimiterRed { fg = "#f85149" },    -- Rainbow Delimiters: Red
+    RainbowDelimiterOrange { fg = "#f9ae28" }, -- Rainbow Delimiters: Orange
 
-    --
-    -- nvim-navic
-    --
-    NavicText { Winbar },
-    NavicIconsFile { CmpItemKindFile },
-    NavicIconsModule { CmpItemKindModule },
-    NavicIconsNamespace { NavicText },
-    NavicIconsPackage { NavicText },
-    NavicIconsClass { CmpItemKindClass },
-    NavicIconsMethod { CmpItemKindMethod },
-    NavicIconsProperty { CmpItemKindProperty },
-    NavicIconsField { CmpItemKindField },
-    NavicIconsConstructor { CmpItemKindConstructor },
-    NavicIconsEnum { CmpItemKindEnum },
-    NavicIconsInterface { CmpItemKindInterface },
-    NavicIconsFunction { CmpItemKindFunction },
-    NavicIconsVariable { CmpItemKindVariable },
-    NavicIconsConstant { CmpItemKindConstant },
-    NavicIconsString { NavicText },
-    NavicIconsNumber { NavicText },
-    NavicIconsBoolean { NavicText },
-    NavicIconsArray { NavicText },
-    NavicIconsObject { NavicText },
-    NavicIconsKey { NavicText },
-    NavicIconsNull { NavicText },
-    NavicIconsEnumMember { CmpItemKindEnumMember },
-    NavicIconsStruct { CmpItemKindStruct },
-    NavicIconsEvent { CmpItemKindEvent },
-    NavicIconsOperator { CmpItemKindOperator },
-    NavicIconsTypeParameter { CmpItemKindTypeParameter },
-    NavicSeparator { NavicText },
+    -- VirtColumn
+    VirtColumn { fg = colors.indent_guide, bg = colors.none }, -- VirtualColumn
 
-    --
-    -- Gitsigns
-    --
-    GitSignsAdd { GutterGitAdded },
-    GitSignsChange { GutterGitModified },
-    GitSignsDelete { GutterGitDeleted },
-    GitSignsAddNr { GitSignsAdd },
-    GitSignsChangeNr { GitSignsChange },
-    GitSignsDeleteNr { GitSignsDelete },
-    GitSignsAddLn { DiffAdd },
-    GitSignsChangeLn { DiffChange },
-    GitSignsDeleteLn { DiffDelete },
-    GitSignsAddInline { DiffTextAdded },
-    GitSignsChangeInline { DiffTextChanged },
-    GitSignsDeleteInline { DiffTextDeleted },
-
-    --
-    -- vim-illuminate
-    --
-    IlluminatedWordText { SelectionHighlightBackground },
-    IlluminatedWordRead { SelectionHighlightBackground },
-    IlluminatedWordWrite { SelectionHighlightBackground },
-
-    --
-    -- Telescope
-    --
-    TelescopeBorder { FloatBorder },
-    TelescopePromptBorder { TelescopeBorder },
-    TelescopeResultsBorder { TelescopePromptBorder },
-    TelescopePreviewBorder { TelescopePromptBorder },
-    TelescopeSelection { PmenuSel },
-    TelescopeSelectionCaret { TelescopeSelection },
-    TelescopeMultiIcon { fg = blue_green },
-    TelescopeMatching { CmpItemAbbrMatch },
-    TelescopeNormal { Normal },
-    TelescopePromptPrefix { Icon },
-
-    --
-    -- Harpoon
-    --
-    HarpoonBorder { TelescopeBorder },
-    HarpoonWindow { TelescopeNormal },
-
-    --
-    -- fFHighlight
-    --
-    fFHintWords { gui = 'underline', sp = 'yellow' },
-    fFHintCurrentWord { gui = 'undercurl', sp = 'yellow' },
-
-    --
-    -- indent-blankline
-    --
-    IblIndent { fg = indent_guide_fg },
-    IblScope { fg = indent_guide_scope_fg },
-
-    --
-    -- hlslens
-    --
-    HlSearchNear { IncSearch },
-    HlSearchLens { Description },
-    HlSearchLensNear { HlSearchLens },
-
-    --
-    -- nvim-ufo
-    --
-    UfoPreviewBorder { PeekViewBorder },
-    UfoPreviewNormal { PeekViewNormal },
-    UfoPreviewCursorLine { PeekViewCursorLine },
-    UfoFoldedFg { fg = norm_fg },
-    UfoFoldedBg { bg = folded_blue },
-    UfoCursorFoldedLine { bg = '#2F3C48', gui = 'bold, italic' },
-    UfoPreviewSbar { PeekViewNormal },
-    UfoPreviewThumb { ScrollbarSlider },
-    UfoFoldedEllipsis { fg = '#989ca0' },
-
-    --
-    -- nvim-bqf
-    --
-    BqfPreviewFloat { PeekViewNormal },
-    BqfPreviewBorder { PeekViewBorder },
-    BqfPreviewTitle { PeekViewTitle },
-    BqfPreviewSbar { PmenuSbar },
-    BqfPreviewThumb { PmenuThumb },
-    BqfPreviewCursor { Cursor },
-    BqfPreviewCursorLine { PeekViewCursorLine },
-    BqfPreviewRange { PeekViewMatchHighlight },
-    BqfPreviewBufLabel { Description },
-    BqfSign { fg = blue_green },
-
-    --
-    -- mg979/tabline.nvim
-    --
-    TSelect { TabLineSel },
-    TVisible { TabLine },
-    THidden { TabLine },
-    TExtra { TabLine },
-    TSpecial { TabLine },
-    TFill { TabLineFill },
-    TCorner { fg = white, bg = Normal.bg },
-    TNumSel { TSelect },
-    TNum { TabLine },
-    TSelectMod { TSelect },
-    TVisibleMod { TVisible },
-    THiddenMod { THidden },
-    TExtraMod { TExtra },
-    TSpecialMod { TSpecial },
-    TSelectDim { TSelect },
-    TVisibleDim { TVisible },
-    THiddenDim { THidden },
-    TExtraDim { TExtra },
-    TSpecialDim { TSpecial },
-    TSelectSep { TabBorder },
-    TVisibleSep { TabBorder },
-    THiddenSep { TabBorder },
-    TExtraSep { TabBorder },
-    TSpecialSep { TabBorder },
-
-    --
-    -- git-messenger.vim
-    --
-    gitmessengerHeader { fg = '#40a6ff' },  -- textLink.activeForeground
-    gitmessengerPopupNormal { NormalFloat },
-    gitmessengerHash { NormalFloat },
-    gitmessengerHistory { NormalFloat },
-    gitmessengerEmail { NormalFloat },
-
-    --
-    -- nvim-treesitter-context
-    --
-    -- TreesitterContext { bg = black4 },
-    TreesitterContextLineNumber { fg = '#4d535a' }, -- 30% darker based on LineNr
-    TreesitterContextBottom { gui = 'underline', sp = FloatBorder.fg },
-
-    --
-    -- nvim-scrollview
-    --
-    ScrollView { ScrollbarSlider },
-    ScrollViewRestricted { ScrollView },
-    ScrollViewConflictsTop { DiffAdd },
-    ScrollViewConflictsMiddle { DiffAdd },
-    ScrollViewConflictsBottom { DiffAdd },
-    ScrollViewCursor { CursorLineNr },
-    ScrollViewDiagnosticsError { DiagnosticError },
-    ScrollViewDiagnosticsWarn { DiagnosticWarn },
-    ScrollViewDiagnosticsHint { DiagnosticHint },
-    ScrollViewDiagnosticsInfo { DiagnosticInfo },
-    ScrollViewSearch { fg = '#9e6a03' },
-    ScrollViewHover { ScrollbarSliderHover },
-
-    --
-    -- vim-floaterm
-    --
-    Floaterm { Normal },
-    FloatermBorder { FloatBorder },
-
-    --
-    -- quick-scope
-    --
-    QuickScopePrimary { fg = bright_pink, gui = 'underline', sp = bright_pink },
-    QuickScopeSecondary { fg = purple, gui = 'underline', sp = purple },
+    -- RenderMarkdown
+    RenderMarkdownMath { fg = colors.teal },                             -- Render LaTeX or math blocks
+    RenderMarkdownH1Bg { bg = Normal.bg },                               -- Background for H1 headers
+    RenderMarkdownH2Bg { bg = Normal.bg },                               -- Background for H2 headers
+    RenderMarkdownH3Bg { bg = Normal.bg },                               -- Background for H3 headers
+    RenderMarkdownH4Bg { bg = Normal.bg },                               -- Background for H4 headers
+    RenderMarkdownH5Bg { bg = Normal.bg },                               -- Background for H5 headers
+    RenderMarkdownH6Bg { bg = Normal.bg },                               -- Background for H6 headers
+    RenderMarkdownH1 { sym("@markup.heading.1") },                       -- Text color/style for H1 headers
+    RenderMarkdownH2 { sym("@markup.heading.2") },                       -- Text color/style for H2 headers
+    RenderMarkdownH3 { sym("@markup.heading.3") },                       -- Text color/style for H3 headers
+    RenderMarkdownH4 { sym("@markup.heading.4") },                       -- Text color/style for H4 headers
+    RenderMarkdownH5 { sym("@markup.heading.5") },                       -- Text color/style for H5 headers
+    RenderMarkdownH6 { sym("@markup.heading.6") },                       -- Text color/style for H6 headers
+    RenderMarkdownCode { bg = "#151515" },                               -- Code block background or style
+    RenderMarkdownCodeInfo { bg = Normal.bg },                           -- Language info in fenced code blocks (e.g., ```js)
+    RenderMarkdownCodeBorder { RenderMarkdownCode },                     -- Border or edge around code blocks
+    RenderMarkdownCodeFallback { RenderMarkdownCode },                   -- Style for code when language is not detected
+    RenderMarkdownCodeInline { bg = Normal.bg },                         -- Inline `code` style
+    RenderMarkdownDash { VertSplit },                                    -- Horizontal rules (---)
+    RenderMarkdownBullet { sym("@markup.list") },                        -- Bullets in lists (*, -, +)
+    RenderMarkdownUnchecked { sym("@markup.list.unchecked") },           -- Unchecked task list items [-]
+    RenderMarkdownChecked { sym("@markup.list.checked") },               -- Checked task list items [x]
+    RenderMarkdownTodo { Todo },                                         -- TODO items (emphasized)
+    RenderMarkdownQuote { sym("@markup.quote") },                        -- Generic quote block style
+    RenderMarkdownQuote1 { RenderMarkdownQuote },                        -- Quote level 1 (>)
+    RenderMarkdownQuote2 { RenderMarkdownQuote },                        -- Quote level 2 (>>)
+    RenderMarkdownQuote3 { RenderMarkdownQuote },                        -- Quote level 3 (>>>)
+    RenderMarkdownQuote4 { RenderMarkdownQuote },                        -- Quote level 4
+    RenderMarkdownQuote5 { RenderMarkdownQuote },                        -- Quote level 5
+    RenderMarkdownQuote6 { RenderMarkdownQuote },                        -- Quote level 6
+    RenderMarkdownTableHead { fg = colors.dark_blue },                   -- Table header row
+    RenderMarkdownTableRow { fg = colors.dark_blue },                    -- Table body rows
+    RenderMarkdownTableFill { bg = Normal.bg },                          -- Filler or padding inside table cells
+    RenderMarkdownInfo { DiagnosticInfo },                               -- Info-style block
+    RenderMarkdownSuccess { DiagnosticOk },                              -- Success-style block
+    RenderMarkdownHint { DiagnosticHint },                               -- Hint or tip blocks
+    RenderMarkdownWarn { DiagnosticWarn },                               -- Warning blocks
+    RenderMarkdownError { DiagnosticError },                             -- Error or danger blocks
+    RenderMarkdownLink { fg = colors.dark_blue },                        -- Regular Markdown links
+    RenderMarkdownWikiLink { fg = colors.dark_blue },                    -- Wiki-style links
+    RenderMarkdownSign { fg = colors.violet },                             -- Signature or blockquote footer
+    RenderMarkdownInlineHighlight { bg = "#2c3c86", fg = colors.white }, -- Inline emphasis/highlight
+    RenderMarkdownIndent { fg = colors.indent_guide },                   -- Indentation guides or markers
+    RenderMarkdownHtmlComment { Comment },                               -- HTML comments in Markdown
   }
 end)
----@diagnostic enable
 
 return theme
